@@ -29,7 +29,7 @@ async fn main() {
         
         let delta_time = get_frame_time();
 
-        player.update(delta_time);
+        player.update(delta_time, &MAP);
 
         clear_background(BLACK);
         
