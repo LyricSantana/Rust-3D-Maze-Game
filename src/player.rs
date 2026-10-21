@@ -18,12 +18,14 @@ impl Player {
             size: 10.0,
         }
     }
-
+    pub fn facing(&self) -> f32 {
+        self.facing
+    }
     pub fn update(&mut self, delta_time: f32, map: &[[u8; MAP[0].len()]; MAP.len()]) {
         const MOVE_SPEED: f32 = 150.0;
-        const TURN_SPEED: f32 = 2.5;
+        const TURN_SPEED: f32 = 4.0;
 
-        let cell_width: f32 = screen_width() / map[0].len() as f32;
+        let cell_width: f32 = screen_width() / 2.0 / map[0].len() as f32;
         let cell_height: f32 = screen_height() / map.len() as f32;
 
         let mut move_vec = (0.0, 0.0);
@@ -87,7 +89,7 @@ impl Player {
         let cos_dir = angle.cos();
         let sin_dir = angle.sin();
 
-        let step_size = 1.0;
+        let step_size = 0.1;
         let mut distance = 0.0;
 
         // draw ray. is it hitting something? if no, step it forward by one step, if yes, return hit position. repeat

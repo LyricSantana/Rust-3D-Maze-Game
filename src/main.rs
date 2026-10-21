@@ -1,14 +1,16 @@
 mod map;
 mod player;
+mod render;
 
 use macroquad::prelude::*;
 use map::MAP;
 use player::Player;
+use render::draw_first_person;
 
 fn window_conf() -> Conf {
     Conf {
         window_title: "Maze Game".to_owned(),
-        window_width: 512,
+        window_width: 1024,
         window_height: 512,
         window_resizable: false,
         ..Default::default()
@@ -17,7 +19,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let cell_width: f32 = screen_width() / MAP[0].len() as f32;
+    let cell_width: f32 = screen_width() / 2.0 / MAP[0].len() as f32;
     let cell_height: f32 = screen_height() / MAP.len() as f32;
     
     let mut player = Player::new(50.0, 50.0);
@@ -41,6 +43,8 @@ async fn main() {
             }
         }
         
+        draw_first_person(&player, &MAP, cell_width, cell_height, 512.0, 512.0);
+
         //Draw player
         player.draw(&MAP, cell_width, cell_height);
         next_frame().await;
