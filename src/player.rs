@@ -89,7 +89,7 @@ impl Player {
         let cos_dir = angle.cos();
         let sin_dir = angle.sin();
 
-        let step_size = 0.1;
+        let step_size = 0.5;
         let mut distance = 0.0;
 
         // draw ray. is it hitting something? if no, step it forward by one step, if yes, return hit position. repeat

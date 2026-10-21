@@ -9,7 +9,7 @@ pub fn draw_first_person(player: &Player, map: &[[u8; MAP[0].len()]; MAP.len()],
     draw_rectangle(view_x, screen_height() / 2.0, view_width, screen_height() / 2.0, YELLOW);
 
     let fov = 60.0 * PI / 180.0;
-    let num_rays = 500;
+    let num_rays = 300;
     let column_width = view_width / num_rays as f32;
     let start_angle = player.facing() - fov / 2.0;
     let projection_plane = (view_width / 2.0) / (fov / 2.0).tan();
