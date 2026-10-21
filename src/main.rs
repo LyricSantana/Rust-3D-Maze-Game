@@ -28,7 +28,6 @@ async fn main() {
         } 
         
         let delta_time = get_frame_time();
-
         player.update(delta_time, &MAP);
 
         clear_background(BLACK);
@@ -43,7 +42,7 @@ async fn main() {
         }
         
         //Draw player
-        player.draw();
+        player.draw(&MAP, cell_width, cell_height);
         next_frame().await;
     }
 }
