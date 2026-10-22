@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 use std::f32::consts::PI;
-use crate::MAP;
+use crate::map::SIZE;
 
 pub struct Player {
     x: f32,
@@ -21,7 +21,7 @@ impl Player {
     pub fn facing(&self) -> f32 {
         self.facing
     }
-    pub fn update(&mut self, delta_time: f32, map: &[[u8; MAP[0].len()]; MAP.len()]) {
+    pub fn update(&mut self, delta_time: f32, map: &[[u8; SIZE]; SIZE]) {
         const MOVE_SPEED: f32 = 150.0;
         const TURN_SPEED: f32 = 4.0;
 
@@ -59,7 +59,7 @@ impl Player {
     }
 
     // ew gross yucky function ewww
-    fn collides_with_map(&self, map: &[[u8; MAP[0].len()]; MAP.len()], cell_w: f32, cell_h: f32) -> bool {
+    fn collides_with_map(&self, map: &[[u8; SIZE]; SIZE], cell_w: f32, cell_h: f32) -> bool {
         // map coordinates down to grid cell indexes
         let start_x = (self.x / cell_w).floor() as i32;
         let end_x = ((self.x + self.size) / cell_w).floor() as i32;
@@ -82,7 +82,7 @@ impl Player {
     false
     }
 
-    pub fn cast_ray(&self, angle: f32, map: &[[u8; MAP[0].len()]; MAP.len()], cell_w: f32, cell_h: f32) -> (f32, f32, f32) {
+    pub fn cast_ray(&self, angle: f32, map: &[[u8; SIZE]; SIZE], cell_w: f32, cell_h: f32) -> (f32, f32, f32) {
         let start_x = self.x + (self.size / 2.0);
         let start_y = self.y + (self.size / 2.0);
 
@@ -112,7 +112,7 @@ impl Player {
         }
     }
 
-    pub fn draw(&self, map: &[[u8; MAP[0].len()]; MAP.len()], cell_w: f32, cell_h: f32) {
+    pub fn draw(&self, map: &[[u8; SIZE]; SIZE], cell_w: f32, cell_h: f32) {
         let start_x = self.x + (self.size / 2.0);
         let start_y = self.y + (self.size / 2.0);
 

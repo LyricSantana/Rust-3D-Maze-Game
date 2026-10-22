@@ -1,10 +1,10 @@
 use macroquad::prelude::*;
 
-use crate::map::MAP;
+use crate::map::SIZE;
 use crate::player::Player;
 use std::f32::consts::PI;
 
-pub fn draw_first_person(player: &Player, map: &[[u8; MAP[0].len()]; MAP.len()], cell_width: f32, cell_height: f32, view_x: f32, view_width: f32) {
+pub fn draw_first_person(player: &Player, map: &[[u8; SIZE]; SIZE], cell_width: f32, cell_height: f32, view_x: f32, view_width: f32) {
     draw_rectangle(view_x, 0.0, view_width, screen_height(), RED);
     draw_rectangle(view_x, screen_height() / 2.0, view_width, screen_height() / 2.0, YELLOW);
 
