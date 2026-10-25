@@ -18,6 +18,17 @@ impl SimpleRng {
     }
 }
 
+pub fn find_endpoint(map: &[[u8; SIZE]; SIZE]) -> (usize, usize) {
+    for y in (1..SIZE - 1).rev() {
+        for x in (1..SIZE - 1).rev() {
+            if map[y][x] == 0 && (x,y) != (1,1) {
+                return (x,y);
+            }
+        }
+    }
+    (1,1)
+}
+
 pub fn generate_maze() -> [[u8; SIZE]; SIZE] {
     let mut map = [[1 as u8; SIZE]; SIZE];
     let mut rng = SimpleRng::new();

@@ -3,9 +3,15 @@ mod player;
 mod render;
 
 use macroquad::prelude::*;
-use map::{generate_maze, SIZE};
+use map::{generate_maze, SIZE, find_endpoint};
 use player::Player;
 use render::draw_first_person;
+
+enum Gamestate {
+    Start,
+    Playing, 
+    Won
+}
 
 fn window_conf() -> Conf {
     Conf {
@@ -17,42 +23,120 @@ fn window_conf() -> Conf {
     }
 }
 
+fn draw_start_screen() {
+    clear_background(BLACK);
+
+    let title = "Maze Game";
+    let subtitle = "Find the Blue Exit";
+    let controls = "WASD to Move | Arrow Keys to Turn";
+    let prompt = "Press ENTER to Start";
+
+    let title_size = 64.0;
+    let subtitle_size = 24.0;
+    let controls_size = 24.0;
+    let prompt_size = 24.0;
+    
+    let title_width = measure_text(title, None, title_size as u16, 1.0).width;
+    let subtitle_width = measure_text(subtitle, None, subtitle_size as u16, 1.0).width;
+    let controls_width = measure_text(controls, None, controls_size as u16, 1.0).width;
+    let prompt_width = measure_text(prompt, None, prompt_size as u16, 1.0).width;
+    
+    draw_text(title, (screen_width() - title_width) / 2.0, screen_height() * 0.3, title_size, GREEN);
+    draw_text(subtitle, (screen_width() - subtitle_width) / 2.0, screen_height() * 0.4, subtitle_size, WHITE);
+    draw_text(controls, (screen_width() - controls_width) / 2.0, screen_height() * 0.6, controls_size, WHITE);
+    draw_text(prompt, (screen_width() - prompt_width) / 2.0, screen_height() * 0.8, prompt_size, WHITE);
+}
+
+fn draw_win_screen() {
+    clear_background(BLACK);
+
+    let title = "You Escaped!";
+    let subtitle = "You Found Your Way Out of the Maze";
+    let prompt = "Press ENTER to Play Again";
+    let quit = "Press ESCAPE to quit";
+
+    let title_size = 64.0;
+    let subtitle_size = 24.0;
+    let prompt_size = 24.0;
+    let quit_size = 24.0;
+
+    let title_width = measure_text(title, None, title_size as u16, 1.0).width;
+    let subtitle_width = measure_text(subtitle, None, subtitle_size as u16, 1.0).width;
+    let prompt_width = measure_text(prompt, None, prompt_size as u16, 1.0).width;
+    let quit_width = measure_text(quit, None, quit_size as u16, 1.0).width;
+
+    draw_text(title, (screen_width() - title_width) / 2.0, screen_height() * 0.3, title_size, GREEN);
+    draw_text(subtitle, (screen_width() - subtitle_width) / 2.0, screen_height() * 0.4, subtitle_size, WHITE);
+    draw_text(prompt, (screen_width() - prompt_width) / 2.0, screen_height() * 0.6, prompt_size, WHITE);
+    draw_text(quit, (screen_width() - quit_width) / 2.0, screen_height() * 0.8, quit_size, WHITE);
+
+
+}
+
 #[macroquad::main(window_conf)]
 async fn main() {
-    let map = generate_maze();
+    let mut map = generate_maze();
+    let mut endpoint = find_endpoint(&map);
 
-    let map_veiw_width = screen_width() / 2.0;
+    let map_view_width = screen_width() / 2.0;
     let cell_width = screen_width() / 2.0 / SIZE as f32;
     let cell_height = screen_height() / SIZE as f32;
     
-    let player_size = 10.0;
+    let player_size = 5.0;
     let player_x = cell_width + (cell_width - player_size) / 2.0;
     let player_y = cell_height + (cell_height - player_size) / 2.0;
     let mut player = Player::new(player_x, player_y);
 
-    
+    let mut state = Gamestate::Start;
+
     loop {
         if is_key_pressed(KeyCode::Escape) {
             break;
         } 
-        
-        let delta_time = get_frame_time();
-        player.update(delta_time, &map);
 
-        clear_background(BLACK);
-        
-        // Draw map
-        for (y, row) in map.iter().enumerate() {
-            for (x, &cell) in row.iter().enumerate() {
-                if cell == 1 {
-                    draw_rectangle( x as f32 * cell_width, y as f32 * cell_height, cell_width, cell_height, GREEN);
+        match state {
+            Gamestate::Start => {
+                if is_key_pressed(KeyCode::Enter) {
+                    state = Gamestate::Playing;
                 }
+                draw_start_screen();
+            }
+            Gamestate::Playing => {
+                let delta_time = get_frame_time();
+                player.update(delta_time, &map);
+
+                if player.reached_endpoint(endpoint, cell_width, cell_height) {
+                    state = Gamestate::Won; 
+                } else {
+
+                    
+                    clear_background(BLACK);
+                
+                // Draw map
+                for (y, row) in map.iter().enumerate() {
+                    for (x, &cell) in row.iter().enumerate() {
+                        if cell == 1 {
+                            draw_rectangle( x as f32 * cell_width, y as f32 * cell_height, cell_width, cell_height, GREEN);
+                        } 
+                    }
+                }
+                draw_rectangle(endpoint.0 as f32 * cell_width, endpoint.1 as f32 * cell_height, cell_width, cell_height, BLUE);
+                draw_first_person(&player, map,cell_width,cell_height,map_view_width,screen_width() - map_view_width,endpoint,);
+
+                //Draw player
+                player.draw(&map, cell_width, cell_height);
             }
         }
-        draw_first_person(&player, &map, cell_width, cell_height, map_veiw_width, 512.0);
-
-        //Draw player
-        player.draw(&map, cell_width, cell_height);
-        next_frame().await;
+        Gamestate::Won => {
+            draw_win_screen();
+            if is_key_pressed(KeyCode::Enter) {
+                map = generate_maze();
+                endpoint = find_endpoint(&map);
+                player = Player::new(player_x, player_y);
+                state = Gamestate::Playing;
+            }
+        }
+    }
+    next_frame().await;
     }
 }
