@@ -1,4 +1,5 @@
 use std::time::{SystemTime, UNIX_EPOCH};
+use std::collections::VecDeque;
 
 pub const SIZE: usize = 25;
 
@@ -18,15 +19,71 @@ impl SimpleRng {
     }
 }
 
+
+// pub fn find_endpoint(map: &[[u8; SIZE]; SIZE]) -> (usize, usize) {
+//     for y in (1..SIZE - 1).rev() {
+//         for x in (1..SIZE - 1).rev() {
+//             if map[y][x] == 0 && (x,y) != (1,1) {
+//                 return (x,y);
+//             }
+//         }
+//     }
+//     (1,1)
+// }
+
+// uses bfs (breadth first search) to make maze (thank you random youtube videos and forum posts from 5 years ago 🙏)
 pub fn find_endpoint(map: &[[u8; SIZE]; SIZE]) -> (usize, usize) {
-    for y in (1..SIZE - 1).rev() {
-        for x in (1..SIZE - 1).rev() {
-            if map[y][x] == 0 && (x,y) != (1,1) {
-                return (x,y);
+    let start = (1 as usize, 1 as usize);
+    // usize MAX means wwe havent visited a cell yet
+    let mut distances = [[usize::MAX; SIZE]; SIZE];
+    let mut queue = VecDeque::new();
+
+    distances[start.1][start.0] = 0;
+    queue.push_back(start);
+
+    //keep track of farthest cell so far
+    let mut farthest = start;
+    let mut farthest_distance = 0;
+    let directions: [(isize, isize); 4] = [
+        (1,0),
+        (-1,0),
+        (0,1),
+        (0,-1),
+    ];
+
+    //continue until there are no more cells to explore
+    while let Some((x,y)) = queue.pop_front() {
+        let current_distance = distances[y][x];
+
+        if current_distance > farthest_distance {
+            farthest = (x,y);
+            farthest_distance = current_distance;
+        }
+
+        for &(dx, dy) in &directions {
+            let next_x = x as isize + dx;
+            let next_y = y as isize + dy;
+
+            if next_x < 0 || next_x >= SIZE as isize || next_y < 0 || next_y >= SIZE as isize {
+                continue;
             }
+
+            let nx = next_x as usize;
+            let ny = next_y as usize;
+
+            if map[nx][ny] == 1 {
+                continue;
+            }
+
+            if distances[ny][nx] != usize::MAX {
+                continue;
+            }
+
+            distances[ny][nx] = current_distance + 1;
+            queue.push_back((nx, ny));
         }
     }
-    (1,1)
+    farthest
 }
 
 pub fn generate_maze() -> [[u8; SIZE]; SIZE] {

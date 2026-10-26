@@ -1,3 +1,6 @@
+/*
+Made by Lyric Santana October 2026 for week 1 of Hack Club's Terra program
+*/
 mod map;
 mod player;
 mod render;
@@ -14,15 +17,23 @@ enum Gamestate {
 }
 
 fn window_conf() -> Conf {
+    // let icon: [u8; 1024] = [255; 1024];
     Conf {
         window_title: "Maze Game".to_owned(),
         window_width: 1024,
         window_height: 512,
         window_resizable: false,
+        //was gonna add an icon but found out it was more complex than i though 
+        // icon: Some(macroquad::miniquad::conf::Icon {
+        //     small: icon,
+        //     medium: [255; 4096],
+        //     big: [255; 16384],
+        // }),
         ..Default::default()
     }
 }
 
+// stupid boring gross redundant code that I hated writing
 fn draw_start_screen() {
     clear_background(BLACK);
 
@@ -54,6 +65,7 @@ fn draw_win_screen(elapsed_seconds: f64) {
     let subtitle = "You Found Your Way Out of the Maze";
     let prompt = "Press ENTER to Play Again";
     let quit = "Press ESCAPE to quit";
+    // took me way too long to figure out you have to use "format!"
     let time = format!("Your Time: {:.1} seconds!", elapsed_seconds);
 
     let title_size = 64.0;
@@ -98,6 +110,7 @@ async fn main() {
     let mut game_start_time = 0.0;
     let mut elapsed_seconds = 0.0;
 
+    //main loop
     loop {
         if is_key_pressed(KeyCode::Escape) {
             break;
