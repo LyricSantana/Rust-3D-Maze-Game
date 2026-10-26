@@ -1,4 +1,3 @@
-use std::time::{SystemTime, UNIX_EPOCH};
 use std::collections::VecDeque;
 
 pub const SIZE: usize = 25;
@@ -8,10 +7,10 @@ struct SimpleRng {
 }
 
 impl SimpleRng {
-    fn new() -> Self {
-        let seed = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_nanos() as u64;
-        Self { state: seed }
-    }
+fn new() -> Self {
+    let seed = macroquad::miniquad::date::now() as u64;
+    Self { state: seed }
+}
 
     fn next_range(&mut self, bounds: usize) -> usize {
         self.state = self.state.wrapping_mul(6364136223846793005).wrapping_add(1);

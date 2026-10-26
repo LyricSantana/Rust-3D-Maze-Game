@@ -64,7 +64,11 @@ fn draw_win_screen(elapsed_seconds: f64) {
     let title = "You Escaped!";
     let subtitle = "You Found Your Way Out of the Maze";
     let prompt = "Press ENTER to Play Again";
-    let quit = "Press ESCAPE to quit";
+    let quit = if cfg!(target_arch = "wasm32") {
+        "Press ESCAPE to return to title"
+    } else {
+        "Press ESCAPE to quit"
+    };
     // took me way too long to figure out you have to use "format!"
     let time = format!("Your Time: {:.1} seconds!", elapsed_seconds);
 
@@ -113,8 +117,23 @@ async fn main() {
     //main loop
     loop {
         if is_key_pressed(KeyCode::Escape) {
-            break;
-        } 
+        // In the browser, return to the title screen.
+        #[cfg(target_arch = "wasm32")]{
+            map = generate_maze();
+            endpoint = find_endpoint(&map);
+            player = Player::new(player_x, player_y);
+
+            show_map = false;
+            elapsed_seconds = 0.0;
+            state = Gamestate::Start;
+        }
+
+    // On Windows and other native platforms, quit normally.
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        break;
+    }
+}
 
         match state {
             Gamestate::Start => {

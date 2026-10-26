@@ -31,7 +31,7 @@
             self.facing
         }
         pub fn update(&mut self, delta_time: f32, map: &[[u8; SIZE]; SIZE]) {
-            const MOVE_SPEED: f32 = 150.0;
+            const MOVE_SPEED: f32 = 100.0;
             const TURN_SPEED: f32 = 4.0;
 
             let cell_width: f32 = screen_width() / 2.0 / map[0].len() as f32;
